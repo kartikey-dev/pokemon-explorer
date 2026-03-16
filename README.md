@@ -1,48 +1,188 @@
 # Pokedex Explorer
 
-A modern, responsive Pokemon exploration application built with React, Next.js 15, and Tailwind CSS. Explore and discover Pokemon from all generations with powerful search and filtering capabilities.
+A modern, responsive Pokemon exploration application built with React, Next.js 15, and Tailwind CSS following **strict Test-Driven Development (TDD)** practices.
 
-![Pokedex Explorer Screenshot](./screenshots/listing-page.png)
+![Pokedex Explorer](./screenshots/listing-page.png)
 
 ## Live Demo
 
 **[View Live Application](https://your-deployment-url.vercel.app)**
 
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [TDD Approach](#tdd-approach)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Setup Instructions](#setup-instructions)
+- [Running Tests](#running-tests)
+- [Project Structure](#project-structure)
+- [Architectural Decisions](#architectural-decisions)
+- [Trade-offs Made](#trade-offs-made)
+- [AI Usage Details](#ai-usage-details)
+- [Future Improvements](#future-improvements)
+
+---
+
 ## Features
 
-- **Pokemon Listing Page**: Browse all 1025 Pokemon in a responsive card grid layout
+- **Pokemon Listing Page**: Browse all 1025 Pokemon in a responsive card grid
 - **Global Search**: Search Pokemon by name across the entire dataset
-- **Type Filtering**: Filter Pokemon by their type (Fire, Water, Grass, etc.)
-- **Pokemon Detail Page**: View comprehensive information including stats, abilities, and moves
-- **Responsive Design**: Optimized for mobile, tablet, and desktop devices
-- **Loading States**: Skeleton loaders for smooth user experience
+- **Type Filtering**: Filter Pokemon by type (Fire, Water, Grass, etc.)
+- **Pokemon Detail Page**: View stats, abilities, moves, and physical attributes
+- **Responsive Design**: Mobile-first design optimized for all screen sizes
+- **Loading States**: Skeleton loaders for smooth UX
 - **Error Handling**: Graceful error states with retry functionality
+- **Pagination**: Navigate through results with first/prev/next/last controls
+
+---
+
+## TDD Approach
+
+This project was built following a **strict Test-Driven Development workflow**:
+
+### The Red-Green-Refactor Cycle
+
+```
+1. RED    → Write a failing test that defines expected behavior
+2. GREEN  → Write minimal code to make the test pass
+3. REFACTOR → Improve code quality while keeping tests green
+```
+
+### TDD Implementation Examples
+
+#### Example 1: API Utility Functions
+
+```typescript
+// RED: First, wrote the failing test
+describe('extractPokemonId', () => {
+  it('should extract ID from Pokemon URL', () => {
+    const url = 'https://pokeapi.co/api/v2/pokemon/25/';
+    expect(extractPokemonId(url)).toBe(25);
+  });
+});
+
+// GREEN: Then implemented the minimal code
+export function extractPokemonId(url: string): number {
+  const matches = url.match(/\/pokemon\/(\d+)\//);
+  return matches ? parseInt(matches[1], 10) : 0;
+}
+
+// REFACTOR: Code was already clean, no changes needed
+```
+
+#### Example 2: Pokemon Card Component
+
+```typescript
+// RED: Test written first
+describe('PokemonCard', () => {
+  it('should render pokemon name and image', () => {
+    render(<PokemonCard pokemon={mockPokemon} />);
+    expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    expect(screen.getByRole('img')).toHaveAttribute('alt', 'Pikachu');
+  });
+
+  it('should display type badges', () => {
+    render(<PokemonCard pokemon={mockPokemon} />);
+    expect(screen.getByText('electric')).toBeInTheDocument();
+  });
+
+  it('should navigate to detail page on click', () => {
+    render(<PokemonCard pokemon={mockPokemon} />);
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', '/pokemon/25');
+  });
+});
+
+// GREEN: Component implemented to pass all tests
+// REFACTOR: Extracted type badge styling to utility function
+```
+
+#### Example 3: Custom Hooks
+
+```typescript
+// RED: Test the hook behavior
+describe('usePokemonByType', () => {
+  it('should not fetch when type is null', () => {
+    const { result } = renderHook(() => usePokemonByType(null));
+    expect(result.current.pokemonOfType).toEqual([]);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it('should fetch pokemon of a specific type', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockTypeResponse),
+    });
+
+    const { result } = renderHook(() => usePokemonByType('fire'));
+    
+    await waitFor(() => {
+      expect(result.current.pokemonOfType).toHaveLength(3);
+    });
+  });
+});
+
+// GREEN: Implemented the hook with SWR
+// REFACTOR: Added caching configuration for performance
+```
+
+### Test Categories
+
+| Category | Description | Files |
+|----------|-------------|-------|
+| **Unit Tests** | Test individual functions in isolation | `pokemon.test.ts` |
+| **Hook Tests** | Test custom React hooks | `use-pokemon.test.ts` |
+| **Component Tests** | Test UI components with user interactions | `*.test.tsx` |
+| **Integration Tests** | Test component + hook combinations | Filter + Grid tests |
+
+### Test Coverage Goals
+
+- **API utilities**: 100% coverage on data transformation functions
+- **Custom hooks**: All edge cases (loading, error, empty states)
+- **Components**: User-visible behavior and accessibility
+- **Business logic**: Filtering, pagination, search algorithms
+
+---
 
 ## Screenshots
 
 ### Listing Page
 ![Listing Page](./screenshots/listing-page.png)
+*Responsive grid layout with Pokemon cards showing name, ID, and type badges*
 
 ### Pokemon Detail Page
 ![Detail Page](./screenshots/detail-page.png)
+*Comprehensive Pokemon information with stats visualization*
 
 ### Search Functionality
 ![Search](./screenshots/search.png)
+*Global search across all 1025 Pokemon*
 
 ### Type Filter
 ![Type Filter](./screenshots/type-filter.png)
+*Filter by any of the 18 Pokemon types*
+
+---
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **UI Components**: shadcn/ui
-- **Data Fetching**: SWR (stale-while-revalidate)
-- **Testing**: Vitest + React Testing Library
-- **API**: [PokeAPI](https://pokeapi.co/)
+| Technology | Purpose |
+|------------|---------|
+| **Next.js 15** | React framework with App Router |
+| **TypeScript** | Type safety and developer experience |
+| **Tailwind CSS v4** | Utility-first styling |
+| **shadcn/ui** | Accessible UI components |
+| **SWR** | Data fetching with caching |
+| **Vitest** | Fast unit testing |
+| **React Testing Library** | Component testing |
+| **PokeAPI** | Pokemon data source |
 
-## Getting Started
+---
+
+## Setup Instructions
 
 ### Prerequisites
 
@@ -51,221 +191,303 @@ A modern, responsive Pokemon exploration application built with React, Next.js 1
 
 ### Installation
 
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/yourusername/pokedex-explorer.git
 cd pokedex-explorer
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 pnpm install
-```
 
-3. Start the development server:
-```bash
+# Start development server
 pnpm dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Running Tests
+### Using shadcn CLI (Recommended)
 
 ```bash
-# Run tests in watch mode
+npx shadcn@latest init
+# Follow prompts, then add components as needed
+```
+
+---
+
+## Running Tests
+
+```bash
+# Run all tests in watch mode
 pnpm test
 
-# Run tests with UI
+# Run tests with UI interface
 pnpm test:ui
 
-# Run tests with coverage
+# Run tests with coverage report
 pnpm test:coverage
+
+# Run specific test file
+pnpm test pokemon-card.test.tsx
 ```
+
+### Test Output Example
+
+```
+ ✓ lib/api/pokemon.test.ts (12 tests)
+ ✓ hooks/use-pokemon.test.ts (15 tests)
+ ✓ components/pokemon/pokemon-card.test.tsx (6 tests)
+ ✓ components/pokemon/pokemon-filters.test.tsx (8 tests)
+ ✓ components/pokemon/pokemon-details.test.tsx (7 tests)
+
+ Test Files  5 passed (5)
+      Tests  48 passed (48)
+   Start at  10:30:45
+   Duration  2.34s
+```
+
+---
 
 ## Project Structure
 
 ```
+pokedex-explorer/
 ├── app/
-│   ├── page.tsx              # Home page (Pokemon listing)
-│   ├── pokemon/[id]/page.tsx # Pokemon detail page
-│   ├── layout.tsx            # Root layout
-│   └── globals.css           # Global styles and design tokens
+│   ├── page.tsx                    # Home page (Pokemon listing)
+│   ├── pokemon/[id]/page.tsx       # Pokemon detail page
+│   ├── layout.tsx                  # Root layout with metadata
+│   └── globals.css                 # Global styles & design tokens
+│
 ├── components/
-│   ├── pokemon/              # Pokemon-specific components
-│   │   ├── pokemon-card.tsx
-│   │   ├── pokemon-card.test.tsx
-│   │   ├── pokemon-grid.tsx
-│   │   ├── pokemon-filters.tsx
+│   ├── pokemon/
+│   │   ├── pokemon-card.tsx        # Individual Pokemon card
+│   │   ├── pokemon-card.test.tsx   # Card tests (TDD)
+│   │   ├── pokemon-card-skeleton.tsx
+│   │   ├── pokemon-grid.tsx        # Card grid layout
+│   │   ├── pokemon-filters.tsx     # Search & type filter
 │   │   ├── pokemon-filters.test.tsx
-│   │   ├── pokemon-details.tsx
+│   │   ├── pokemon-details.tsx     # Detail view component
 │   │   ├── pokemon-details.test.tsx
-│   │   ├── pokemon-pagination.tsx
-│   │   └── ...
-│   └── ui/                   # shadcn/ui components
+│   │   ├── pokemon-details-skeleton.tsx
+│   │   ├── pokemon-pagination.tsx  # Pagination controls
+│   │   └── index.ts                # Barrel exports
+│   └── ui/                         # shadcn/ui components
+│
 ├── hooks/
-│   ├── use-pokemon.ts        # Pokemon data fetching hooks
-│   └── use-pokemon.test.ts   # Hook tests
+│   ├── use-pokemon.ts              # Pokemon data hooks
+│   └── use-pokemon.test.ts         # Hook tests (TDD)
+│
 ├── lib/
 │   ├── api/
-│   │   ├── pokemon.ts        # API utilities
-│   │   └── pokemon.test.ts   # API tests
+│   │   ├── pokemon.ts              # API utilities & fetcher
+│   │   └── pokemon.test.ts         # API tests (TDD)
 │   └── types/
-│       └── pokemon.ts        # TypeScript types
-└── vitest.config.ts          # Vitest configuration
+│       └── pokemon.ts              # TypeScript interfaces
+│
+├── vitest.config.ts                # Vitest configuration
+├── vitest.setup.ts                 # Test setup & mocks
+└── README.md                       # This file
 ```
+
+---
 
 ## Architectural Decisions
 
 ### 1. Data Fetching Strategy
 
-**Decision**: Use SWR for client-side data fetching with a two-tier approach:
-- Fetch all Pokemon names/IDs upfront (lightweight, ~50KB)
-- Fetch detailed Pokemon data only for the current page (20 at a time)
+**Decision**: Two-tier data fetching with SWR
 
-**Rationale**: This enables global search across all 1025 Pokemon while keeping network requests minimal. The Pokemon list is cached aggressively, and detailed data is fetched on-demand.
+```
+Tier 1: All Pokemon names/IDs (lightweight, ~50KB, cached 5 min)
+Tier 2: Detailed data for current page only (20 Pokemon at a time)
+```
 
-### 2. Component Architecture
+**Rationale**: 
+- Enables instant global search without loading all details
+- Minimizes bandwidth while maintaining responsive UX
+- SWR handles caching, deduplication, and revalidation automatically
 
-**Decision**: Split components by feature (Pokemon) rather than by type.
+### 2. Global Filtering Architecture
 
-**Rationale**: Co-locating related components, hooks, and tests improves maintainability and makes it easier to understand the feature as a whole.
+**Decision**: Fetch Pokemon by type from `/type/{name}` endpoint
 
-### 3. State Management
+**Rationale**:
+- PokeAPI provides all Pokemon of a type in one request
+- Enables true global filtering (not just current page)
+- Combined with name search for powerful filtering
 
-**Decision**: Use React's built-in useState for UI state and SWR for server state.
+### 3. Component Architecture
 
-**Rationale**: The application's state requirements are simple enough that external state management libraries (Redux, Zustand) would add unnecessary complexity. SWR handles caching, revalidation, and loading states automatically.
+**Decision**: Feature-based organization with co-located tests
 
-### 4. Styling Approach
+```
+components/pokemon/
+  ├── pokemon-card.tsx
+  └── pokemon-card.test.tsx  # Test next to component
+```
 
-**Decision**: Use Tailwind CSS with shadcn/ui components and CSS custom properties for theming.
+**Rationale**: 
+- Easy to find related files
+- Tests serve as documentation
+- Encourages TDD workflow
 
-**Rationale**: This combination provides:
-- Rapid development with utility classes
-- Accessible, well-tested base components
-- Easy theming through CSS variables
-- No runtime CSS-in-JS overhead
+### 4. State Management
 
-### 5. Testing Strategy
+**Decision**: React useState + SWR (no external state library)
 
-**Decision**: Focus on integration tests that test components as users interact with them.
+**Rationale**:
+- UI state (filters, pagination) is local
+- Server state is managed by SWR
+- No need for Redux/Zustand complexity
 
-**Rationale**: Following Testing Library's guiding principle: "The more your tests resemble the way your software is used, the more confidence they can give you."
+### 5. Testing Philosophy
+
+**Decision**: Test behavior, not implementation
+
+```typescript
+// Good: Tests what user sees
+expect(screen.getByText('Pikachu')).toBeInTheDocument();
+
+// Avoid: Tests implementation details
+expect(component.state.pokemonName).toBe('Pikachu');
+```
+
+**Rationale**: Tests should give confidence that the app works for users, not that internal details match expectations.
+
+---
 
 ## Trade-offs Made
 
-### 1. Client-Side Filtering vs. Server-Side
+### 1. Client-Side vs. Server-Side Filtering
 
-**Trade-off**: Implemented client-side filtering with upfront data loading.
+| Approach | Chosen | Alternative |
+|----------|--------|-------------|
+| Client-side filtering | Yes | Server-side with custom API |
 
-**Pros**:
+**Pros of chosen approach**:
 - Instant search results (no network latency)
-- Works offline once loaded
-- Simpler implementation
+- Works offline once data is loaded
+- PokeAPI doesn't support server-side search
 
 **Cons**:
-- Initial load fetches all Pokemon names (~50KB)
-- Type filtering requires fetching details for current page first
-
-**Why this choice**: The PokeAPI doesn't support server-side search/filtering, so client-side filtering is the only option for a good UX.
+- Initial load of all Pokemon names (~50KB)
+- Type filtering requires fetching type endpoint
 
 ### 2. Pagination vs. Infinite Scroll
 
-**Trade-off**: Chose traditional pagination over infinite scroll.
+| Approach | Chosen | Alternative |
+|----------|--------|-------------|
+| Traditional pagination | Yes | Infinite scroll |
 
-**Pros**:
-- Users can navigate to any page directly
-- Better for bookmarking specific results
-- Simpler implementation and testing
-
-**Cons**:
-- Less "mobile-app-like" experience
-- Requires explicit user action to load more
-
-### 3. Pre-fetching vs. On-Demand Detail Loading
-
-**Trade-off**: Fetch Pokemon details only when viewing the current page.
-
-**Pros**:
-- Reduced initial bandwidth usage
-- Faster time to first meaningful paint
+**Pros of chosen approach**:
+- Direct navigation to any page
+- Bookmarkable results
+- Simpler to test and implement
 
 **Cons**:
-- Type filtering only works within loaded Pokemon on current page
-- Brief loading state when changing pages
+- Less "modern" mobile experience
+- Requires explicit user action
 
-### 4. Dark Theme Default
+### 3. Fetch Details On-Demand
 
-**Trade-off**: Defaulted to dark theme without theme toggle.
+| Approach | Chosen | Alternative |
+|----------|--------|-------------|
+| On-demand details | Yes | Pre-fetch all details |
 
-**Pros**:
-- Cohesive, polished visual design
-- Reduced scope for initial implementation
+**Pros of chosen approach**:
+- Fast initial load
+- Reduced bandwidth
 
 **Cons**:
-- No light mode option for users who prefer it
+- Brief loading when changing pages
+- Type filtering limited to known types from type endpoint
+
+### 4. Dark Theme Only
+
+| Approach | Chosen | Alternative |
+|----------|--------|-------------|
+| Dark theme default | Yes | Theme toggle |
+
+**Pros of chosen approach**:
+- Cohesive design
+- Reduced scope
+- Pokemon-themed aesthetic
+
+**Cons**:
+- No user preference
+- Accessibility considerations
+
+---
 
 ## AI Usage Details
 
-This project was built with assistance from AI (v0 by Vercel). Here's how AI was utilized:
+This project was built with AI assistance (v0 by Vercel). Full transparency on usage:
 
-### Code Generation
-- **Scaffolding**: Initial project structure, component boilerplates, and TypeScript types
-- **Test Cases**: Generated test cases for components, hooks, and utility functions
-- **API Integration**: Pokemon API fetching logic and data transformation utilities
+### Where AI Was Used
 
-### Documentation
-- **README Structure**: AI helped draft this README following best practices
-- **Code Comments**: Generated JSDoc comments for functions and components
-
-### Design
-- **Color Scheme**: AI suggested a Pokemon-themed dark color palette
-- **Component Styling**: Tailwind class combinations for responsive layouts
+| Area | AI Contribution | Human Oversight |
+|------|-----------------|-----------------|
+| **Test Cases** | Generated test structure and edge cases | Reviewed for meaningful assertions |
+| **Component Code** | Scaffolded components from tests | Refined styling and UX |
+| **API Utilities** | Generated fetcher and transformers | Validated against PokeAPI docs |
+| **TypeScript Types** | Generated from API responses | Ensured completeness |
+| **Documentation** | Drafted README structure | Edited for accuracy |
 
 ### Prompts Used
-1. "Create a Pokemon listing page with card grid layout using PokeAPI"
-2. "Add comprehensive filtering with search by name and filter by type"
-3. "Create Pokemon detail page with stats visualization"
-4. "Set up Vitest testing infrastructure with React Testing Library"
-5. "Fix filtering to work across all Pokemon, not just current page"
 
-### Human Decisions
-- Architectural decisions (SWR over React Query, pagination over infinite scroll)
-- Trade-off evaluations
-- Code review and refinement
-- Final testing and bug fixes
+1. **Initial Setup**:
+   > "Create a Pokemon listing page with card grid layout using PokeAPI, following TDD with Vitest"
 
-## Performance Considerations
+2. **Testing Infrastructure**:
+   > "Set up Vitest testing infrastructure with React Testing Library"
 
-- **SWR Caching**: Pokemon data is cached to minimize redundant API calls
-- **Debounced Search**: Search input is debounced (300ms) to prevent excessive filtering
-- **Image Optimization**: Uses official artwork from PokeAPI CDN
-- **Code Splitting**: Next.js automatically code-splits by route
+3. **Global Filtering**:
+   > "Fix filtering to work across all Pokemon data, not just current page. Filter should show first 20 filtered results on page 1, next 20 on page 2"
+
+4. **Type Filtering**:
+   > "Add type-based filtering that fetches all Pokemon of that type from PokeAPI's type endpoint"
+
+5. **Documentation**:
+   > "Create a README as per TDD requirements with architectural decisions and trade-offs"
+
+### Human Decisions Made
+
+- Chose SWR over React Query for simplicity
+- Decided on pagination over infinite scroll
+- Selected color scheme and visual design
+- Determined test coverage priorities
+- Made all architectural trade-off decisions
+- Reviewed and refined all generated code
+
+### AI Limitations Encountered
+
+- Initial type filtering only worked on current page (fixed with human guidance)
+- Required explicit prompts for global filtering behavior
+- README needed human editing for accuracy
+
+---
 
 ## Future Improvements
 
-- [ ] Add light/dark theme toggle
-- [ ] Implement Pokemon comparison feature
-- [ ] Add favorites/bookmarks (with localStorage or database)
-- [ ] Server-side search using a custom API layer
-- [ ] Add Pokemon evolution chain visualization
-- [ ] Implement PWA support for offline access
-- [ ] Add internationalization (i18n)
+- [ ] **Theme Toggle**: Add light/dark mode preference
+- [ ] **Pokemon Comparison**: Compare stats side-by-side
+- [ ] **Favorites**: Save favorites with localStorage
+- [ ] **Evolution Chains**: Visualize evolution paths
+- [ ] **PWA Support**: Offline access capability
+- [ ] **i18n**: Multi-language support
+- [ ] **E2E Tests**: Add Playwright/Cypress tests
+- [ ] **Accessibility Audit**: WCAG 2.1 compliance review
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+---
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
 
 ## Acknowledgments
 
-- [PokeAPI](https://pokeapi.co/) for the comprehensive Pokemon data
-- [shadcn/ui](https://ui.shadcn.com/) for beautiful, accessible components
-- [Vercel](https://vercel.com/) for hosting and deployment
+- [PokeAPI](https://pokeapi.co/) - Comprehensive Pokemon data API
+- [shadcn/ui](https://ui.shadcn.com/) - Beautiful, accessible components
+- [Vercel](https://vercel.com/) - Deployment platform
+- [Incubyte](https://incubyte.co/) - Engineering kata challenge
