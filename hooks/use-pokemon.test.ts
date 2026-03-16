@@ -6,6 +6,7 @@ import {
   usePokemonTypes,
   useAllPokemon,
   usePokemonDetails,
+  usePokemonByType,
 } from './use-pokemon'
 
 // Mock fetch globally
@@ -269,5 +270,73 @@ describe('usePokemonDetails', () => {
     expect(result.current.pokemonDetails[0].types).toContain('grass')
     expect(result.current.pokemonDetails[1].name).toBe('charmander')
     expect(result.current.pokemonDetails[1].types).toContain('fire')
+  })
+})
+
+describe('usePokemonByType', () => {
+  beforeEach(() => {
+    mockFetch.mockClear()
+  })
+
+  it('should not fetch when type is null', () => {
+    const { result } = renderHook(() => usePokemonByType(null))
+
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.pokemonOfType).toEqual([])
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
+  it('should fetch pokemon of a specific type', async () => {
+    const mockResponse = {
+      id: 10,
+      name: 'fire',
+      pokemon: [
+        { pokemon: { name: 'charmander', url: 'https://pokeapi.co/api/v2/pokemon/4/' }, slot: 1 },
+        { pokemon: { name: 'charmeleon', url: 'https://pokeapi.co/api/v2/pokemon/5/' }, slot: 1 },
+        { pokemon: { name: 'charizard', url: 'https://pokeapi.co/api/v2/pokemon/6/' }, slot: 1 },
+      ],
+    }
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    })
+
+    const { result } = renderHook(() => usePokemonByType('fire'))
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(result.current.pokemonOfType).toHaveLength(3)
+    expect(result.current.pokemonOfType[0].name).toBe('charmander')
+    expect(result.current.pokemonOfType[0].id).toBe(4)
+    expect(result.current.pokemonOfType[0].types).toContain('fire')
+  })
+
+  it('should filter out invalid Pokemon IDs', async () => {
+    const mockResponse = {
+      id: 10,
+      name: 'fire',
+      pokemon: [
+        { pokemon: { name: 'charmander', url: 'https://pokeapi.co/api/v2/pokemon/4/' }, slot: 1 },
+        { pokemon: { name: 'invalid', url: 'https://pokeapi.co/api/v2/pokemon/99999/' }, slot: 1 },
+      ],
+    }
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    })
+
+    const { result } = renderHook(() => usePokemonByType('fire'))
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    // Should only include charmander (id 4), not invalid (id 99999)
+    expect(result.current.pokemonOfType).toHaveLength(1)
+    expect(result.current.pokemonOfType[0].name).toBe('charmander')
   })
 })

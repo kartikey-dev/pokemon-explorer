@@ -124,4 +124,5 @@ export const API_URLS = {
   allPokemon: `${BASE_URL}/pokemon?limit=${TOTAL_POKEMON}&offset=0`,
   pokemon: (idOrName: string | number) => `${BASE_URL}/pokemon/${idOrName}`,
   types: `${BASE_URL}/type`,
+  pokemonByType: (type: string) => `${BASE_URL}/type/${type}`,
 }

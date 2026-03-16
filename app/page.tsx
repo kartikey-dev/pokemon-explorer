@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { PokemonGrid } from '@/components/pokemon/pokemon-grid'
 import { PokemonFilters } from '@/components/pokemon/pokemon-filters'
 import { PokemonPagination } from '@/components/pokemon/pokemon-pagination'
-import { useAllPokemon, usePokemonDetails } from '@/hooks/use-pokemon'
+import { useAllPokemon, usePokemonByType, usePokemonDetails } from '@/hooks/use-pokemon'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, RefreshCw } from 'lucide-react'
@@ -16,7 +16,7 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<Filters>({ search: '', type: null })
 
-  // Fetch ALL Pokemon basic info (just names and IDs)
+  // Fetch ALL Pokemon basic info (names and IDs)
   const {
     allPokemon,
     totalCount,
@@ -25,39 +25,58 @@ export default function HomePage() {
     mutate: refetchList,
   } = useAllPokemon()
 
-  // First, filter by name (can be done without fetching details)
-  const nameFilteredPokemon = useMemo(() => {
-    if (!filters.search) return allPokemon
-    return allPokemon.filter((p) =>
-      p.name.toLowerCase().includes(filters.search.toLowerCase())
-    )
-  }, [allPokemon, filters.search])
+  // Fetch Pokemon of selected type (if type filter is active)
+  const {
+    pokemonOfType,
+    isLoading: typeLoading,
+    isError: typeError,
+  } = usePokemonByType(filters.type)
 
-  // Calculate pagination for filtered results
-  const totalFilteredCount = nameFilteredPokemon.length
+  // Determine base list: if type filter is active, use Pokemon of that type; otherwise use all
+  const basePokemonList = useMemo(() => {
+    if (filters.type) {
+      return pokemonOfType
+    }
+    return allPokemon
+  }, [filters.type, pokemonOfType, allPokemon])
+
+  // Apply name search filter to the base list
+  const filteredPokemon = useMemo(() => {
+    if (!filters.search) return basePokemonList
+    const searchLower = filters.search.toLowerCase()
+    return basePokemonList.filter((p) =>
+      p.name.toLowerCase().includes(searchLower)
+    )
+  }, [basePokemonList, filters.search])
+
+  // Calculate pagination based on fully filtered results
+  const totalFilteredCount = filteredPokemon.length
   const totalPages = Math.ceil(totalFilteredCount / ITEMS_PER_PAGE)
 
-  // Get current page's Pokemon IDs
-  const currentPagePokemonIds = useMemo(() => {
+  // Get current page's Pokemon IDs from filtered results
+  const currentPagePokemon = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
     const endIndex = startIndex + ITEMS_PER_PAGE
-    return nameFilteredPokemon.slice(startIndex, endIndex).map((p) => p.id)
-  }, [nameFilteredPokemon, currentPage])
+    return filteredPokemon.slice(startIndex, endIndex)
+  }, [filteredPokemon, currentPage])
 
-  // Fetch details for current page's Pokemon only
+  const currentPagePokemonIds = useMemo(() => {
+    return currentPagePokemon.map((p) => p.id)
+  }, [currentPagePokemon])
+
+  // Fetch full details (including all types) for current page's Pokemon only
   const {
     pokemonDetails,
     isLoading: detailsLoading,
-    isError: detailsError,
   } = usePokemonDetails(currentPagePokemonIds)
 
-  // Filter by type (requires fetched details)
-  const filteredPokemon = useMemo(() => {
-    if (!filters.type) return pokemonDetails
-    return pokemonDetails.filter((p) =>
-      p.types.includes(filters.type as string)
-    )
-  }, [pokemonDetails, filters.type])
+  // Use fetched details if available, otherwise use basic data from filtered list
+  const displayPokemon = useMemo(() => {
+    if (pokemonDetails.length > 0) {
+      return pokemonDetails
+    }
+    return currentPagePokemon
+  }, [pokemonDetails, currentPagePokemon])
 
   // Handle page change
   const handlePageChange = useCallback((page: number) => {
@@ -76,15 +95,25 @@ export default function HomePage() {
     refetchList()
   }, [refetchList])
 
-  const isLoading = listLoading || detailsLoading
-  const isError = listError || detailsError
+  // Loading state: show skeleton when loading initial data or when changing type filter
+  const isInitialLoading = listLoading || (filters.type && typeLoading)
+  const isPageLoading = detailsLoading
+  const isError = listError || typeError
 
   // Show filtered count info
   const showingText = useMemo(() => {
+    if (totalFilteredCount === 0) return 'No results'
     const start = (currentPage - 1) * ITEMS_PER_PAGE + 1
     const end = Math.min(currentPage * ITEMS_PER_PAGE, totalFilteredCount)
     return `Showing ${start}-${end} of ${totalFilteredCount.toLocaleString()}`
   }, [currentPage, totalFilteredCount])
+
+  const filterDescription = useMemo(() => {
+    const parts: string[] = []
+    if (filters.type) parts.push(`Type: ${filters.type}`)
+    if (filters.search) parts.push(`Search: "${filters.search}"`)
+    return parts.length > 0 ? parts.join(', ') : null
+  }, [filters])
 
   return (
     <main className="min-h-screen bg-background">
@@ -105,6 +134,11 @@ export default function HomePage() {
                 <p className="text-sm text-muted-foreground">
                   {showingText}
                 </p>
+                {filterDescription && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {filterDescription}
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Page {currentPage} of {totalPages || 1}
                 </p>
@@ -146,39 +180,46 @@ export default function HomePage() {
 
         {/* Pokemon Grid */}
         <PokemonGrid
-          pokemon={filteredPokemon as PokemonCardData[]}
-          isLoading={isLoading}
+          pokemon={displayPokemon as PokemonCardData[]}
+          isLoading={!!isInitialLoading || isPageLoading}
           skeletonCount={ITEMS_PER_PAGE}
         />
 
         {/* No Results */}
-        {!isLoading && !isError && filteredPokemon.length === 0 && totalFilteredCount === 0 && (
+        {!isInitialLoading && !isError && filteredPokemon.length === 0 && (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground">
-              No Pokemon found matching your search.
+              No Pokemon found matching your filters.
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Try adjusting your search or type filter.
             </p>
             <Button
               variant="outline"
               className="mt-4"
               onClick={() => handleFiltersChange({ search: '', type: null })}
             >
-              Clear Filters
+              Clear All Filters
             </Button>
           </div>
         )}
 
         {/* Pagination */}
-        {!isLoading && !isError && totalFilteredCount > 0 && (
+        {!isInitialLoading && !isError && totalFilteredCount > 0 && (
           <div className="mt-8 flex flex-col items-center gap-4">
             <PokemonPagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
-              isLoading={isLoading}
+              isLoading={isPageLoading}
             />
             <p className="text-sm text-muted-foreground">
               Total Pokemon: {totalCount.toLocaleString()}
-              {filters.search && ` (${totalFilteredCount.toLocaleString()} matching)`}
+              {(filters.search || filters.type) && (
+                <span className="ml-1">
+                  ({totalFilteredCount.toLocaleString()} matching filters)
+                </span>
+              )}
             </p>
           </div>
         )}

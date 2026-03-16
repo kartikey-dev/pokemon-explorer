@@ -13,7 +13,9 @@ import type {
   PokemonListResponse,
   PokemonCardData,
   PokemonTypeResponse,
+  TypeDetailResponse,
 } from '@/lib/types/pokemon'
+import { TOTAL_POKEMON } from '@/lib/api/pokemon'
 
 // Hook to fetch Pokemon list
 export function usePokemonList(limit: number = 20, offset: number = 0) {
@@ -124,6 +126,38 @@ export function usePokemonTypes() {
 
   return {
     types: standardTypes || [],
+    isLoading,
+    isError: !!error,
+    error,
+  }
+}
+
+// Hook to fetch all Pokemon of a specific type
+export function usePokemonByType(typeName: string | null) {
+  const { data, error, isLoading } = useSWR<TypeDetailResponse>(
+    typeName ? API_URLS.pokemonByType(typeName) : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 300000, // Cache for 5 minutes
+    }
+  )
+
+  // Transform to basic Pokemon data, filtering only valid Pokemon (id <= TOTAL_POKEMON)
+  const pokemonOfType: PokemonCardData[] = (data?.pokemon || [])
+    .map((entry) => {
+      const id = extractPokemonId(entry.pokemon.url)
+      return {
+        id,
+        name: entry.pokemon.name,
+        image: getPokemonImageUrl(id),
+        types: [typeName || ''], // At minimum has this type
+      }
+    })
+    .filter((p) => p.id > 0 && p.id <= TOTAL_POKEMON) // Filter valid Pokemon only
+
+  return {
+    pokemonOfType,
     isLoading,
     isError: !!error,
     error,

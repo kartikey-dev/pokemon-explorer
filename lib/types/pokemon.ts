@@ -85,6 +85,21 @@ export interface PokemonTypeResponse {
   results: PokemonType[]
 }
 
+// Response from /type/{name} endpoint
+export interface TypeDetailResponse {
+  id: number
+  name: string
+  pokemon: TypePokemonEntry[]
+}
+
+export interface TypePokemonEntry {
+  pokemon: {
+    name: string
+    url: string
+  }
+  slot: number
+}
+
 // Filter state
 export interface PokemonFilters {
   search: string
