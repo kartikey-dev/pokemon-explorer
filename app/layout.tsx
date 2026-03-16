@@ -1,0 +1,46 @@
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import './globals.css'
+
+const _geist = Geist({ subsets: ["latin"] });
+const _geistMono = Geist_Mono({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: 'Pokedex Explorer - Discover Pokemon',
+  description: 'Explore and discover Pokemon from all generations. Search, filter by type, and view detailed stats for every Pokemon.',
+  generator: 'v0.app',
+  keywords: ['Pokemon', 'Pokedex', 'PokeAPI', 'Pokemon Stats', 'Pokemon Types'],
+  icons: {
+    icon: [
+      {
+        url: '/icon-light-32x32.png',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/icon-dark-32x32.png',
+        media: '(prefers-color-scheme: dark)',
+      },
+      {
+        url: '/icon.svg',
+        type: 'image/svg+xml',
+      },
+    ],
+    apple: '/apple-icon.png',
+  },
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en">
+      <body className="font-sans antialiased">
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  )
+}
