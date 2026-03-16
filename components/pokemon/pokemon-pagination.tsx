@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface PokemonPaginationProps {
   currentPage: number
@@ -75,7 +76,7 @@ export function PokemonPagination({
 
   return (
     <nav
-      className="flex items-center justify-center gap-1"
+      className="flex items-center justify-center gap-1 bg-card/50 backdrop-blur-sm rounded-full px-2 py-1.5 shadow-sm border border-border/50"
       aria-label="Pagination"
     >
       {/* First page */}
@@ -85,6 +86,7 @@ export function PokemonPagination({
         onClick={() => onPageChange(1)}
         disabled={!canGoPrevious || isLoading}
         aria-label="Go to first page"
+        className="h-8 w-8 rounded-full"
       >
         <ChevronsLeft className="h-4 w-4" />
       </Button>
@@ -96,17 +98,18 @@ export function PokemonPagination({
         onClick={() => onPageChange(currentPage - 1)}
         disabled={!canGoPrevious || isLoading}
         aria-label="Go to previous page"
+        className="h-8 w-8 rounded-full"
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
 
       {/* Page numbers */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5 mx-1">
         {pageNumbers.map((page, index) =>
           typeof page === 'string' ? (
             <span
               key={`ellipsis-${index}`}
-              className="px-2 text-muted-foreground"
+              className="px-2 text-muted-foreground text-sm"
               aria-hidden="true"
             >
               {page}
@@ -120,6 +123,10 @@ export function PokemonPagination({
               disabled={isLoading}
               aria-label={`Go to page ${page}`}
               aria-current={page === currentPage ? 'page' : undefined}
+              className={cn(
+                'h-8 w-8 rounded-full text-sm font-medium',
+                page === currentPage && 'shadow-md'
+              )}
             >
               {page}
             </Button>
@@ -134,6 +141,7 @@ export function PokemonPagination({
         onClick={() => onPageChange(currentPage + 1)}
         disabled={!canGoNext || isLoading}
         aria-label="Go to next page"
+        className="h-8 w-8 rounded-full"
       >
         <ChevronRight className="h-4 w-4" />
       </Button>
@@ -145,6 +153,7 @@ export function PokemonPagination({
         onClick={() => onPageChange(totalPages)}
         disabled={!canGoNext || isLoading}
         aria-label="Go to last page"
+        className="h-8 w-8 rounded-full"
       >
         <ChevronsRight className="h-4 w-4" />
       </Button>

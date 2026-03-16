@@ -4,75 +4,76 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Pokemon-inspired dark theme with teal accent */
-  --background: oklch(0.13 0.01 240);
-  --foreground: oklch(0.96 0.01 240);
-  --card: oklch(0.17 0.015 240);
-  --card-foreground: oklch(0.96 0.01 240);
-  --popover: oklch(0.15 0.012 240);
-  --popover-foreground: oklch(0.96 0.01 240);
-  --primary: oklch(0.72 0.15 180);
-  --primary-foreground: oklch(0.13 0.01 240);
-  --secondary: oklch(0.22 0.02 240);
-  --secondary-foreground: oklch(0.96 0.01 240);
-  --muted: oklch(0.22 0.015 240);
-  --muted-foreground: oklch(0.65 0.02 240);
-  --accent: oklch(0.72 0.15 180);
-  --accent-foreground: oklch(0.13 0.01 240);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.96 0.01 240);
-  --border: oklch(0.28 0.02 240);
-  --input: oklch(0.22 0.015 240);
-  --ring: oklch(0.72 0.15 180);
-  --chart-1: oklch(0.72 0.15 180);
-  --chart-2: oklch(0.65 0.18 45);
-  --chart-3: oklch(0.6 0.2 280);
-  --chart-4: oklch(0.7 0.15 140);
-  --chart-5: oklch(0.65 0.2 25);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.15 0.012 240);
-  --sidebar-foreground: oklch(0.96 0.01 240);
-  --sidebar-primary: oklch(0.72 0.15 180);
-  --sidebar-primary-foreground: oklch(0.13 0.01 240);
-  --sidebar-accent: oklch(0.22 0.02 240);
-  --sidebar-accent-foreground: oklch(0.96 0.01 240);
-  --sidebar-border: oklch(0.28 0.02 240);
-  --sidebar-ring: oklch(0.72 0.15 180);
+  /* Light theme - Warm Pokemon-inspired palette */
+  --background: oklch(0.97 0.02 60);
+  --foreground: oklch(0.20 0.02 60);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.20 0.02 60);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.20 0.02 60);
+  --primary: oklch(0.65 0.18 45);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.92 0.03 60);
+  --secondary-foreground: oklch(0.25 0.02 60);
+  --muted: oklch(0.94 0.02 60);
+  --muted-foreground: oklch(0.50 0.02 60);
+  --accent: oklch(0.70 0.15 45);
+  --accent-foreground: oklch(0.15 0.02 60);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.88 0.03 60);
+  --input: oklch(0.92 0.02 60);
+  --ring: oklch(0.65 0.18 45);
+  --chart-1: oklch(0.65 0.18 45);
+  --chart-2: oklch(0.60 0.18 180);
+  --chart-3: oklch(0.55 0.20 280);
+  --chart-4: oklch(0.60 0.15 140);
+  --chart-5: oklch(0.55 0.20 340);
+  --radius: 1rem;
+  --sidebar: oklch(0.96 0.02 60);
+  --sidebar-foreground: oklch(0.20 0.02 60);
+  --sidebar-primary: oklch(0.65 0.18 45);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.92 0.03 60);
+  --sidebar-accent-foreground: oklch(0.25 0.02 60);
+  --sidebar-border: oklch(0.88 0.03 60);
+  --sidebar-ring: oklch(0.65 0.18 45);
 }
 
 .dark {
-  --background: oklch(0.13 0.01 240);
-  --foreground: oklch(0.96 0.01 240);
-  --card: oklch(0.17 0.015 240);
-  --card-foreground: oklch(0.96 0.01 240);
-  --popover: oklch(0.15 0.012 240);
-  --popover-foreground: oklch(0.96 0.01 240);
-  --primary: oklch(0.72 0.15 180);
-  --primary-foreground: oklch(0.13 0.01 240);
-  --secondary: oklch(0.22 0.02 240);
-  --secondary-foreground: oklch(0.96 0.01 240);
-  --muted: oklch(0.22 0.015 240);
-  --muted-foreground: oklch(0.65 0.02 240);
-  --accent: oklch(0.72 0.15 180);
-  --accent-foreground: oklch(0.13 0.01 240);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.96 0.01 240);
-  --border: oklch(0.28 0.02 240);
-  --input: oklch(0.22 0.015 240);
-  --ring: oklch(0.72 0.15 180);
-  --chart-1: oklch(0.72 0.15 180);
-  --chart-2: oklch(0.65 0.18 45);
-  --chart-3: oklch(0.6 0.2 280);
-  --chart-4: oklch(0.7 0.15 140);
-  --chart-5: oklch(0.65 0.2 25);
-  --sidebar: oklch(0.15 0.012 240);
-  --sidebar-foreground: oklch(0.96 0.01 240);
-  --sidebar-primary: oklch(0.72 0.15 180);
-  --sidebar-primary-foreground: oklch(0.13 0.01 240);
-  --sidebar-accent: oklch(0.22 0.02 240);
-  --sidebar-accent-foreground: oklch(0.96 0.01 240);
-  --sidebar-border: oklch(0.28 0.02 240);
-  --sidebar-ring: oklch(0.72 0.15 180);
+  /* Dark theme - Deep blue Pokemon night */
+  --background: oklch(0.14 0.02 260);
+  --foreground: oklch(0.95 0.01 260);
+  --card: oklch(0.18 0.025 260);
+  --card-foreground: oklch(0.95 0.01 260);
+  --popover: oklch(0.16 0.02 260);
+  --popover-foreground: oklch(0.95 0.01 260);
+  --primary: oklch(0.70 0.16 45);
+  --primary-foreground: oklch(0.14 0.02 260);
+  --secondary: oklch(0.22 0.03 260);
+  --secondary-foreground: oklch(0.95 0.01 260);
+  --muted: oklch(0.22 0.02 260);
+  --muted-foreground: oklch(0.60 0.02 260);
+  --accent: oklch(0.70 0.16 45);
+  --accent-foreground: oklch(0.14 0.02 260);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.95 0.01 260);
+  --border: oklch(0.28 0.03 260);
+  --input: oklch(0.22 0.02 260);
+  --ring: oklch(0.70 0.16 45);
+  --chart-1: oklch(0.70 0.16 45);
+  --chart-2: oklch(0.60 0.18 180);
+  --chart-3: oklch(0.55 0.20 280);
+  --chart-4: oklch(0.60 0.15 140);
+  --chart-5: oklch(0.55 0.20 340);
+  --sidebar: oklch(0.16 0.02 260);
+  --sidebar-foreground: oklch(0.95 0.01 260);
+  --sidebar-primary: oklch(0.70 0.16 45);
+  --sidebar-primary-foreground: oklch(0.14 0.02 260);
+  --sidebar-accent: oklch(0.22 0.03 260);
+  --sidebar-accent-foreground: oklch(0.95 0.01 260);
+  --sidebar-border: oklch(0.28 0.03 260);
+  --sidebar-ring: oklch(0.70 0.16 45);
 }
 
 @theme inline {
@@ -123,4 +124,130 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Pokemon-themed background patterns */
+.pokemon-bg-pattern {
+  background-image: 
+    radial-gradient(circle at 20% 80%, oklch(0.90 0.08 45 / 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, oklch(0.85 0.08 30 / 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, oklch(0.95 0.04 60 / 0.5) 0%, transparent 70%);
+}
+
+.dark .pokemon-bg-pattern {
+  background-image: 
+    radial-gradient(circle at 20% 80%, oklch(0.30 0.08 260 / 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, oklch(0.25 0.08 280 / 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, oklch(0.20 0.04 260 / 0.3) 0%, transparent 70%);
+}
+
+/* Pokeball decorative element */
+.pokeball-bg {
+  position: relative;
+}
+
+.pokeball-bg::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: linear-gradient(
+    180deg,
+    oklch(0.60 0.20 25 / 0.08) 0%,
+    oklch(0.60 0.20 25 / 0.08) 45%,
+    oklch(0.30 0.02 260 / 0.08) 45%,
+    oklch(0.30 0.02 260 / 0.08) 55%,
+    oklch(0.95 0.01 60 / 0.08) 55%,
+    oklch(0.95 0.01 60 / 0.08) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark .pokeball-bg::before {
+  background: linear-gradient(
+    180deg,
+    oklch(0.50 0.18 25 / 0.12) 0%,
+    oklch(0.50 0.18 25 / 0.12) 45%,
+    oklch(0.20 0.02 260 / 0.15) 45%,
+    oklch(0.20 0.02 260 / 0.15) 55%,
+    oklch(0.85 0.01 60 / 0.08) 55%,
+    oklch(0.85 0.01 60 / 0.08) 100%
+  );
+}
+
+/* Type-based gradient backgrounds for detail page */
+.type-gradient-fire {
+  background: linear-gradient(135deg, oklch(0.75 0.15 45 / 0.2) 0%, oklch(0.85 0.10 30 / 0.1) 100%);
+}
+
+.type-gradient-water {
+  background: linear-gradient(135deg, oklch(0.70 0.12 230 / 0.2) 0%, oklch(0.80 0.08 220 / 0.1) 100%);
+}
+
+.type-gradient-grass {
+  background: linear-gradient(135deg, oklch(0.70 0.15 140 / 0.2) 0%, oklch(0.80 0.10 130 / 0.1) 100%);
+}
+
+.type-gradient-electric {
+  background: linear-gradient(135deg, oklch(0.85 0.15 90 / 0.2) 0%, oklch(0.90 0.10 85 / 0.1) 100%);
+}
+
+.type-gradient-psychic {
+  background: linear-gradient(135deg, oklch(0.70 0.15 330 / 0.2) 0%, oklch(0.80 0.10 320 / 0.1) 100%);
+}
+
+.type-gradient-ice {
+  background: linear-gradient(135deg, oklch(0.80 0.10 200 / 0.2) 0%, oklch(0.88 0.06 195 / 0.1) 100%);
+}
+
+.type-gradient-dragon {
+  background: linear-gradient(135deg, oklch(0.55 0.18 280 / 0.2) 0%, oklch(0.65 0.14 275 / 0.1) 100%);
+}
+
+.type-gradient-dark {
+  background: linear-gradient(135deg, oklch(0.30 0.04 260 / 0.3) 0%, oklch(0.40 0.03 255 / 0.2) 100%);
+}
+
+.type-gradient-fairy {
+  background: linear-gradient(135deg, oklch(0.80 0.12 350 / 0.2) 0%, oklch(0.88 0.08 345 / 0.1) 100%);
+}
+
+.type-gradient-normal {
+  background: linear-gradient(135deg, oklch(0.80 0.02 60 / 0.2) 0%, oklch(0.88 0.01 55 / 0.1) 100%);
+}
+
+.type-gradient-fighting {
+  background: linear-gradient(135deg, oklch(0.55 0.20 25 / 0.2) 0%, oklch(0.65 0.15 20 / 0.1) 100%);
+}
+
+.type-gradient-poison {
+  background: linear-gradient(135deg, oklch(0.55 0.18 300 / 0.2) 0%, oklch(0.65 0.14 295 / 0.1) 100%);
+}
+
+.type-gradient-ground {
+  background: linear-gradient(135deg, oklch(0.65 0.12 70 / 0.2) 0%, oklch(0.75 0.08 65 / 0.1) 100%);
+}
+
+.type-gradient-flying {
+  background: linear-gradient(135deg, oklch(0.75 0.10 260 / 0.2) 0%, oklch(0.85 0.06 255 / 0.1) 100%);
+}
+
+.type-gradient-bug {
+  background: linear-gradient(135deg, oklch(0.70 0.15 120 / 0.2) 0%, oklch(0.80 0.10 115 / 0.1) 100%);
+}
+
+.type-gradient-rock {
+  background: linear-gradient(135deg, oklch(0.55 0.06 80 / 0.2) 0%, oklch(0.65 0.04 75 / 0.1) 100%);
+}
+
+.type-gradient-ghost {
+  background: linear-gradient(135deg, oklch(0.45 0.15 290 / 0.2) 0%, oklch(0.55 0.12 285 / 0.1) 100%);
+}
+
+.type-gradient-steel {
+  background: linear-gradient(135deg, oklch(0.70 0.03 250 / 0.2) 0%, oklch(0.80 0.02 245 / 0.1) 100%);
 }
