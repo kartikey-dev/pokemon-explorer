@@ -4,6 +4,8 @@ import {
   usePokemonList,
   usePokemon,
   usePokemonTypes,
+  useAllPokemon,
+  usePokemonDetails,
 } from './use-pokemon'
 
 // Mock fetch globally
@@ -173,5 +175,99 @@ describe('usePokemonTypes', () => {
     // Should filter out 'unknown' and 'shadow' types
     expect(result.current.types).toHaveLength(2)
     expect(result.current.types.map((t) => t.name)).toEqual(['normal', 'fire'])
+  })
+})
+
+describe('useAllPokemon', () => {
+  beforeEach(() => {
+    mockFetch.mockClear()
+  })
+
+  it('should fetch all pokemon and transform to card data', async () => {
+    const mockResponse = {
+      count: 1025,
+      results: [
+        { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/' },
+        { name: 'charmander', url: 'https://pokeapi.co/api/v2/pokemon/4/' },
+      ],
+    }
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    })
+
+    const { result } = renderHook(() => useAllPokemon())
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(result.current.allPokemon).toHaveLength(2)
+    expect(result.current.allPokemon[0]).toEqual({
+      id: 1,
+      name: 'bulbasaur',
+      image: expect.stringContaining('1.png'),
+      types: [],
+    })
+    expect(result.current.totalCount).toBe(1025)
+  })
+})
+
+describe('usePokemonDetails', () => {
+  beforeEach(() => {
+    mockFetch.mockClear()
+  })
+
+  it('should not fetch when ids array is empty', () => {
+    const { result } = renderHook(() => usePokemonDetails([]))
+
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.pokemonDetails).toEqual([])
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
+  it('should fetch pokemon details for given ids', async () => {
+    const mockPokemon1 = {
+      id: 1,
+      name: 'bulbasaur',
+      sprites: {
+        front_default: 'https://example.com/1.png',
+        other: { 'official-artwork': { front_default: 'https://example.com/1-art.png' } },
+      },
+      types: [{ slot: 1, type: { name: 'grass', url: '' } }],
+    }
+
+    const mockPokemon2 = {
+      id: 4,
+      name: 'charmander',
+      sprites: {
+        front_default: 'https://example.com/4.png',
+        other: { 'official-artwork': { front_default: 'https://example.com/4-art.png' } },
+      },
+      types: [{ slot: 1, type: { name: 'fire', url: '' } }],
+    }
+
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockPokemon1),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockPokemon2),
+      })
+
+    const { result } = renderHook(() => usePokemonDetails([1, 4]))
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(result.current.pokemonDetails).toHaveLength(2)
+    expect(result.current.pokemonDetails[0].name).toBe('bulbasaur')
+    expect(result.current.pokemonDetails[0].types).toContain('grass')
+    expect(result.current.pokemonDetails[1].name).toBe('charmander')
+    expect(result.current.pokemonDetails[1].types).toContain('fire')
   })
 })

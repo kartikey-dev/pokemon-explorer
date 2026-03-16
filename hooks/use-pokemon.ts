@@ -6,6 +6,7 @@ import {
   API_URLS,
   extractPokemonId,
   transformToCardData,
+  getPokemonImageUrl,
 } from '@/lib/api/pokemon'
 import type {
   Pokemon,
@@ -31,6 +32,38 @@ export function usePokemonList(limit: number = 20, offset: number = 0) {
   }
 }
 
+// Hook to fetch ALL Pokemon with basic info (for global filtering)
+export function useAllPokemon() {
+  const { data, error, isLoading, mutate } = useSWR<PokemonListResponse>(
+    API_URLS.allPokemon,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 300000, // Cache for 5 minutes
+    }
+  )
+
+  // Transform to include ID and image URL from the list
+  const allPokemon: PokemonCardData[] = (data?.results || []).map((pokemon) => {
+    const id = extractPokemonId(pokemon.url)
+    return {
+      id,
+      name: pokemon.name,
+      image: getPokemonImageUrl(id),
+      types: [], // Will be fetched when needed
+    }
+  })
+
+  return {
+    allPokemon,
+    totalCount: data?.count || 0,
+    isLoading,
+    isError: !!error,
+    error,
+    mutate,
+  }
+}
+
 // Hook to fetch single Pokemon details
 export function usePokemon(idOrName: string | number | null) {
   const { data, error, isLoading } = useSWR<Pokemon>(
@@ -46,17 +79,14 @@ export function usePokemon(idOrName: string | number | null) {
   }
 }
 
-// Hook to fetch multiple Pokemon details
-export function usePokemonDetails(
-  pokemonList: Array<{ name: string; url: string }>
-) {
+// Hook to fetch multiple Pokemon details by IDs
+export function usePokemonDetails(pokemonIds: number[]) {
   const { data, error, isLoading } = useSWR<PokemonCardData[]>(
-    pokemonList.length > 0
-      ? ['pokemon-details', pokemonList.map((p) => p.name).join(',')]
+    pokemonIds.length > 0
+      ? ['pokemon-details', pokemonIds.join(',')]
       : null,
     async () => {
-      const pokemonPromises = pokemonList.map(async (item) => {
-        const id = extractPokemonId(item.url)
+      const pokemonPromises = pokemonIds.map(async (id) => {
         const pokemon = await fetcher<Pokemon>(API_URLS.pokemon(id))
         return transformToCardData(pokemon)
       })

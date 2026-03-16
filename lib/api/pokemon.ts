@@ -114,10 +114,14 @@ export const typeColors: Record<string, { bg: string; text: string }> = {
   fairy: { bg: 'bg-pink-400', text: 'text-gray-900' },
 }
 
+// Total Pokemon count (Gen 1-9)
+export const TOTAL_POKEMON = 1025
+
 // API URLs for SWR keys
 export const API_URLS = {
   pokemonList: (limit: number, offset: number) =>
     `${BASE_URL}/pokemon?limit=${limit}&offset=${offset}`,
+  allPokemon: `${BASE_URL}/pokemon?limit=${TOTAL_POKEMON}&offset=0`,
   pokemon: (idOrName: string | number) => `${BASE_URL}/pokemon/${idOrName}`,
   types: `${BASE_URL}/type`,
 }

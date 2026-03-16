@@ -4,72 +4,71 @@ import { useState, useMemo, useCallback } from 'react'
 import { PokemonGrid } from '@/components/pokemon/pokemon-grid'
 import { PokemonFilters } from '@/components/pokemon/pokemon-filters'
 import { PokemonPagination } from '@/components/pokemon/pokemon-pagination'
-import { usePokemonList, usePokemonDetails } from '@/hooks/use-pokemon'
+import { useAllPokemon, usePokemonDetails } from '@/hooks/use-pokemon'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 import type { PokemonFilters as Filters, PokemonCardData } from '@/lib/types/pokemon'
 
 const ITEMS_PER_PAGE = 20
-const TOTAL_POKEMON = 1025 // Gen 1-9
 
 export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<Filters>({ search: '', type: null })
 
-  // Calculate offset for API
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE
-
-  // Fetch pokemon list
+  // Fetch ALL Pokemon basic info (just names and IDs)
   const {
-    pokemonList,
+    allPokemon,
     totalCount,
     isLoading: listLoading,
     isError: listError,
     mutate: refetchList,
-  } = usePokemonList(ITEMS_PER_PAGE, offset)
+  } = useAllPokemon()
 
-  // Fetch pokemon details for cards
+  // First, filter by name (can be done without fetching details)
+  const nameFilteredPokemon = useMemo(() => {
+    if (!filters.search) return allPokemon
+    return allPokemon.filter((p) =>
+      p.name.toLowerCase().includes(filters.search.toLowerCase())
+    )
+  }, [allPokemon, filters.search])
+
+  // Calculate pagination for filtered results
+  const totalFilteredCount = nameFilteredPokemon.length
+  const totalPages = Math.ceil(totalFilteredCount / ITEMS_PER_PAGE)
+
+  // Get current page's Pokemon IDs
+  const currentPagePokemonIds = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+    const endIndex = startIndex + ITEMS_PER_PAGE
+    return nameFilteredPokemon.slice(startIndex, endIndex).map((p) => p.id)
+  }, [nameFilteredPokemon, currentPage])
+
+  // Fetch details for current page's Pokemon only
   const {
     pokemonDetails,
     isLoading: detailsLoading,
     isError: detailsError,
-  } = usePokemonDetails(pokemonList)
+  } = usePokemonDetails(currentPagePokemonIds)
 
-  // Filter pokemon based on search and type
+  // Filter by type (requires fetched details)
   const filteredPokemon = useMemo(() => {
-    let result = pokemonDetails
-
-    // Filter by search term
-    if (filters.search) {
-      result = result.filter((p) =>
-        p.name.toLowerCase().includes(filters.search.toLowerCase())
-      )
-    }
-
-    // Filter by type
-    if (filters.type) {
-      result = result.filter((p) =>
-        p.types.includes(filters.type as string)
-      )
-    }
-
-    return result
-  }, [pokemonDetails, filters])
-
-  // Calculate total pages
-  const totalPages = Math.ceil(Math.min(totalCount, TOTAL_POKEMON) / ITEMS_PER_PAGE)
+    if (!filters.type) return pokemonDetails
+    return pokemonDetails.filter((p) =>
+      p.types.includes(filters.type as string)
+    )
+  }, [pokemonDetails, filters.type])
 
   // Handle page change
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page)
-    // Scroll to top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
   // Handle filter change - reset to page 1 when filtering
   const handleFiltersChange = useCallback((newFilters: Filters) => {
     setFilters(newFilters)
+    setCurrentPage(1) // Reset to first page when filters change
   }, [])
 
   // Handle retry
@@ -79,6 +78,13 @@ export default function HomePage() {
 
   const isLoading = listLoading || detailsLoading
   const isError = listError || detailsError
+
+  // Show filtered count info
+  const showingText = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE + 1
+    const end = Math.min(currentPage * ITEMS_PER_PAGE, totalFilteredCount)
+    return `Showing ${start}-${end} of ${totalFilteredCount.toLocaleString()}`
+  }, [currentPage, totalFilteredCount])
 
   return (
     <main className="min-h-screen bg-background">
@@ -97,10 +103,10 @@ export default function HomePage() {
               </div>
               <div className="hidden sm:block text-right">
                 <p className="text-sm text-muted-foreground">
-                  Showing {filteredPokemon.length} of {ITEMS_PER_PAGE} loaded
+                  {showingText}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Page {currentPage} of {totalPages}
+                  Page {currentPage} of {totalPages || 1}
                 </p>
               </div>
             </div>
@@ -145,8 +151,24 @@ export default function HomePage() {
           skeletonCount={ITEMS_PER_PAGE}
         />
 
+        {/* No Results */}
+        {!isLoading && !isError && filteredPokemon.length === 0 && totalFilteredCount === 0 && (
+          <div className="text-center py-12">
+            <p className="text-lg text-muted-foreground">
+              No Pokemon found matching your search.
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => handleFiltersChange({ search: '', type: null })}
+            >
+              Clear Filters
+            </Button>
+          </div>
+        )}
+
         {/* Pagination */}
-        {!isLoading && !isError && filteredPokemon.length > 0 && (
+        {!isLoading && !isError && totalFilteredCount > 0 && (
           <div className="mt-8 flex flex-col items-center gap-4">
             <PokemonPagination
               currentPage={currentPage}
@@ -155,7 +177,8 @@ export default function HomePage() {
               isLoading={isLoading}
             />
             <p className="text-sm text-muted-foreground">
-              Total Pokemon: {Math.min(totalCount, TOTAL_POKEMON).toLocaleString()}
+              Total Pokemon: {totalCount.toLocaleString()}
+              {filters.search && ` (${totalFilteredCount.toLocaleString()} matching)`}
             </p>
           </div>
         )}
