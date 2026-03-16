@@ -13,11 +13,12 @@ const PAGE_SIZES = [10, 20, 30, 50, 100]
 interface PageSizeSelectorProps {
   value: number
   onChange: (value: number) => void
+  className?: string
 }
 
-export function PageSizeSelector({ value, onChange }: PageSizeSelectorProps) {
+export function PageSizeSelector({ value, onChange, className }: PageSizeSelectorProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className={`flex items-center gap-2 ${className || ''}`}>
       <span className="text-sm text-muted-foreground whitespace-nowrap">Show:</span>
       <Select
         value={value.toString()}

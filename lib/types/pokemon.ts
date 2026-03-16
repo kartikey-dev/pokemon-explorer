@@ -22,6 +22,7 @@ export interface Pokemon {
   stats: PokemonStat[]
   abilities: PokemonAbility[]
   moves: PokemonMove[]
+  held_items: PokemonHeldItem[]
 }
 
 export interface PokemonSprites {
@@ -71,6 +72,20 @@ export interface PokemonMove {
     name: string
     url: string
   }
+}
+
+export interface PokemonHeldItem {
+  item: {
+    name: string
+    url: string
+  }
+  version_details: {
+    rarity: number
+    version: {
+      name: string
+      url: string
+    }
+  }[]
 }
 
 export interface PokemonType {

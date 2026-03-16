@@ -68,7 +68,7 @@ export function useAllPokemon() {
 
 // Hook to fetch single Pokemon details
 export function usePokemon(idOrName: string | number | null) {
-  const { data, error, isLoading } = useSWR<Pokemon>(
+  const { data, error, isLoading, mutate } = useSWR<Pokemon>(
     idOrName ? API_URLS.pokemon(idOrName) : null,
     fetcher
   )
@@ -78,12 +78,13 @@ export function usePokemon(idOrName: string | number | null) {
     isLoading,
     isError: !!error,
     error,
+    mutate,
   }
 }
 
 // Hook to fetch multiple Pokemon details by IDs
 export function usePokemonDetails(pokemonIds: number[]) {
-  const { data, error, isLoading } = useSWR<PokemonCardData[]>(
+  const { data, error, isLoading, mutate } = useSWR<PokemonCardData[]>(
     pokemonIds.length > 0
       ? ['pokemon-details', pokemonIds.join(',')]
       : null,
@@ -105,12 +106,13 @@ export function usePokemonDetails(pokemonIds: number[]) {
     isLoading,
     isError: !!error,
     error,
+    mutate,
   }
 }
 
 // Hook to fetch Pokemon types
 export function usePokemonTypes() {
-  const { data, error, isLoading } = useSWR<PokemonTypeResponse>(
+  const { data, error, isLoading, mutate } = useSWR<PokemonTypeResponse>(
     API_URLS.types,
     fetcher,
     {
@@ -129,12 +131,13 @@ export function usePokemonTypes() {
     isLoading,
     isError: !!error,
     error,
+    mutate,
   }
 }
 
 // Hook to fetch all Pokemon of a specific type
 export function usePokemonByType(typeName: string | null) {
-  const { data, error, isLoading } = useSWR<TypeDetailResponse>(
+  const { data, error, isLoading, mutate } = useSWR<TypeDetailResponse>(
     typeName ? API_URLS.pokemonByType(typeName) : null,
     fetcher,
     {
@@ -161,5 +164,6 @@ export function usePokemonByType(typeName: string | null) {
     isLoading,
     isError: !!error,
     error,
+    mutate,
   }
 }

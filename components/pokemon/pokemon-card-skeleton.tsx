@@ -1,29 +1,26 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function PokemonCardSkeleton() {
   return (
-    <Card className="overflow-hidden border-0 bg-card shadow-lg rounded-2xl">
-      <CardContent className="p-5">
-        <div className="flex flex-col items-center gap-3 relative">
-          {/* ID skeleton */}
-          <div className="absolute top-0 right-0">
-            <Skeleton className="h-4 w-12" />
-          </div>
+    <div className="relative overflow-hidden rounded-2xl glass-card p-4 sm:p-5">
+      {/* Top accent stripe placeholder */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-muted/60 rounded-t-2xl" />
 
-          {/* Image skeleton */}
-          <Skeleton className="h-28 w-28 sm:h-32 sm:w-32 rounded-full" />
-
-          {/* Name skeleton */}
-          <Skeleton className="h-5 w-24" />
-
-          {/* Type badges skeleton */}
-          <div className="flex gap-1.5">
-            <Skeleton className="h-5 w-14 rounded-full" />
-            <Skeleton className="h-5 w-14 rounded-full" />
-          </div>
+      <div className="flex flex-col items-center gap-3">
+        {/* ID */}
+        <div className="self-end">
+          <Skeleton className="h-4 w-10 rounded-md" />
         </div>
-      </CardContent>
-    </Card>
+        {/* Sprite */}
+        <Skeleton className="h-28 w-28 sm:h-36 sm:w-36 rounded-full" />
+        {/* Name */}
+        <Skeleton className="h-4 w-20 rounded-lg" />
+        {/* Type badges */}
+        <div className="flex gap-1.5">
+          <Skeleton className="h-5 w-14 rounded-full" />
+          <Skeleton className="h-5 w-14 rounded-full" />
+        </div>
+      </div>
+    </div>
   )
 }
