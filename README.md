@@ -6,7 +6,7 @@ A modern, responsive Pokemon exploration application built with React, Next.js 1
 
 ## Live Demo
 
-**[View Live Application](https://pokedex-explorer-eight.vercel.app/)**
+**[View Live Application](https://pokemon-explorer-indol-psi.vercel.app/)**
 
 ---
 
