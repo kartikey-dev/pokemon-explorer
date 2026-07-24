@@ -334,4 +334,3 @@ MIT License - see [LICENSE](LICENSE) for details.
 - [PokeAPI](https://pokeapi.co/) - Comprehensive Pokemon data API
 - [shadcn/ui](https://ui.shadcn.com/) - Beautiful, accessible components
 - [Vercel](https://vercel.com/) - Deployment platform
-- [Incubyte](https://incubyte.co/) - Engineering kata challenge
